@@ -1,0 +1,27 @@
+{
+  "tx_power_dBm": 0.0,
+  "fiber_length_km": 20.0,
+  "fiber_loss_dB_per_km": 0.2,
+  "num_connectors": 2,
+  "connector_loss_dB": 0.5,
+  "num_splices": 4,
+  "splice_loss_dB": 0.1,
+  "mux_demux_loss_dB": 1.5,
+  "other_loss_dB": 1.0,
+  "amplifier_gain_dB": 0.0,
+  "noise_figure_dB": 5.0,
+  "receiver_sensitivity_dBm": -18.0,
+  "noise_floor_dBm_per_0_1nm": -35.0,
+  "wavelength_nm": 1550.0,
+  "reference_bandwidth_nm": 0.1,
+  "bit_rate_Gbps": 10.0,
+  "samples_per_bit": 32,
+  "num_bits": 4096,
+  "extinction_ratio_dB": 10.0,
+  "seed": 7,
+  "distance_sweep_km": {
+    "start": 0,
+    "stop": 80,
+    "step": 5
+  }
+}
