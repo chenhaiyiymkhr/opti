@@ -18,6 +18,7 @@ class OsnrResult:
 
 
 def bandwidth_nm_to_hz(wavelength_nm: float, bandwidth_nm: float) -> float:
+    # 由 f=c/lambda 近似微分可得：df≈c*d(lambda)/lambda^2。
     wavelength_m = wavelength_nm * 1e-9
     bandwidth_m = bandwidth_nm * 1e-9
     return LIGHT_SPEED * bandwidth_m / (wavelength_m ** 2)
@@ -31,8 +32,10 @@ def estimate_osnr(rx_power_dBm: float, cfg: dict) -> OsnrResult:
     P_ASE ~= NF * h * nu * (G - 1) * B_ref.
     Otherwise a configured receiver-side optical noise floor is used.
     """
+    # OSNR 计算需要在线性功率域完成，因此先把 dBm 转成 W。
     signal_w = dBm_to_watts(rx_power_dBm)
     wavelength_m = cfg["wavelength_nm"] * 1e-9
+    # 光频率 nu = c / lambda。
     optical_freq = LIGHT_SPEED / wavelength_m
     ref_bw_hz = bandwidth_nm_to_hz(
         cfg["wavelength_nm"], cfg["reference_bandwidth_nm"]
@@ -40,13 +43,17 @@ def estimate_osnr(rx_power_dBm: float, cfg: dict) -> OsnrResult:
 
     gain_linear = db_to_linear(cfg["amplifier_gain_dB"])
     if cfg["amplifier_gain_dB"] > 0:
+        # 有光放大器时，用简化 EDFA ASE 公式估算噪声功率。
+        # P_ASE ≈ NF * h * nu * (G - 1) * B_ref。
         nf_linear = db_to_linear(cfg["noise_figure_dB"])
         noise_w = nf_linear * PLANCK * optical_freq * (gain_linear - 1.0) * ref_bw_hz
         note = "EDFA ASE approximation"
     else:
+        # 没有放大器时，直接使用配置文件中的光噪声底。
         noise_w = dBm_to_watts(cfg["noise_floor_dBm_per_0_1nm"])
         note = "configured optical noise floor"
 
+    # OSNR = 信号功率 / 噪声功率。
     osnr_linear = signal_w / noise_w if noise_w > 0 else float("inf")
     return OsnrResult(
         signal_power_watts=signal_w,
