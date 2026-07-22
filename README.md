@@ -114,6 +114,14 @@ python run_demo.py
 
 运行后会在 `results/` 目录生成结果文件。
 
+如果希望运行后直接显示四张结果图：
+
+```powershell
+python run_demo.py --show
+```
+
+该命令会在生成结果后弹出一个 2x2 图像窗口，依次显示距离扫描图、默认链路眼图、低 OSNR 眼图和 BER-Q 曲线。
+
 示例输出：
 
 ```text

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
 
 
@@ -68,3 +69,21 @@ def plot_ber_q_curve(df, output_path: Path):
     plt.tight_layout()
     plt.savefig(output_path, dpi=180)
     plt.close()
+
+
+def show_result_images(image_paths):
+    """Display generated result images in a 2x2 matplotlib window."""
+    titles = [
+        "Distance Sweep",
+        "Nominal Eye Diagram",
+        "Low-OSNR Eye Diagram",
+        "BER-Q Curve",
+    ]
+    fig, axes = plt.subplots(2, 2, figsize=(14, 9))
+    for ax, title, image_path in zip(axes.ravel(), titles, image_paths):
+        img = mpimg.imread(image_path)
+        ax.imshow(img)
+        ax.set_title(title)
+        ax.axis("off")
+    plt.tight_layout()
+    plt.show()

@@ -9,7 +9,12 @@ from src.link_budget import calculate_link_budget
 from src.metrics import calculate_q_ber
 from src.ook_sim import add_awgn, generate_bits, raised_edge_nrz, sample_waveform
 from src.osnr import estimate_osnr
-from src.plots import plot_ber_q_curve, plot_distance_sweep, plot_eye_diagram
+from src.plots import (
+    plot_ber_q_curve,
+    plot_distance_sweep,
+    plot_eye_diagram,
+    show_result_images,
+)
 
 
 ROOT = Path(__file__).resolve().parent
@@ -105,6 +110,11 @@ def main():
         default=str(ROOT / "results"),
         help="Directory for generated tables and figures.",
     )
+    parser.add_argument(
+        "--show",
+        action="store_true",
+        help="Display the four generated result figures after the simulation.",
+    )
     args = parser.parse_args()
 
     cfg = load_config(Path(args.config))
@@ -122,6 +132,16 @@ def main():
     print(f"  BER estimate: {metrics.ber_estimate:.3e}")
     print()
     print(f"Generated {len(df)} sweep points in {results_dir}")
+
+    if args.show:
+        show_result_images(
+            [
+                results_dir / "distance_sweep.png",
+                results_dir / "eye_diagram_nominal.png",
+                results_dir / "eye_diagram_low_osnr.png",
+                results_dir / "ber_q_curve.png",
+            ]
+        )
 
 
 if __name__ == "__main__":
