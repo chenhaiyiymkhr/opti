@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.link_budget import calculate_link_budget
+from src.link_budget import calculate_link_budget     # 调用各个功能模块
 from src.metrics import calculate_q_ber
 from src.ook_sim import add_awgn, generate_bits, raised_edge_nrz, sample_waveform
 from src.osnr import estimate_osnr
-from src.plots import (
+from src.plots import ( 
     plot_ber_q_curve,
     plot_distance_sweep,
     plot_eye_diagram,
@@ -20,7 +20,7 @@ from src.plots import (
 ROOT = Path(__file__).resolve().parent
 
 
-def load_config(path: Path) -> dict:
+def load_config(path: Path) -> dict:  # 加载配置文件，读取输入参数
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -35,6 +35,7 @@ def run_single_case(cfg: dict, results_dir: Path):
     noisy_wave = add_awgn(clean_wave, osnr.osnr_dB, cfg["seed"])
     samples = sample_waveform(noisy_wave, cfg["samples_per_bit"])
     metrics = calculate_q_ber(bits, samples)
+    # 项目流程：链路预算 -> OSNR -> bit -> OOK波形 -> 加噪声 -> 采样 -> Q/BER
 
     # Also generate an intentionally noisy eye diagram for visual comparison.
     low_osnr_wave = add_awgn(clean_wave, max(osnr.osnr_dB - 12.0, 1.0), cfg["seed"] + 1)
@@ -49,7 +50,7 @@ def run_single_case(cfg: dict, results_dir: Path):
         low_osnr_wave,
         cfg["samples_per_bit"],
         results_dir / "eye_diagram_low_osnr.png",
-        f"Low-OSNR Eye Diagram, OSNR={max(osnr.osnr_dB - 12.0, 1.0):.1f} dB",
+        f"Low-OSNR Eye Diagram, OSNR={max(osnr.osnr_dB - 12.0, 1.0):.1f} dB", # 把OSNR降低12dB，生成低OSNR的眼图，用来对比
     )
 
     summary = {
@@ -66,8 +67,8 @@ def run_distance_sweep(cfg: dict, results_dir: Path):
     sweep = cfg["distance_sweep_km"]
     distances = list(range(int(sweep["start"]), int(sweep["stop"]) + 1, int(sweep["step"])))
     rows = []
-    for i, distance in enumerate(distances):
-        case = dict(cfg)
+    for i, distance in enumerate(distances): # 距离扫描，循环，对每个距离只改变光纤长度
+        case = dict(cfg)                     # 每个距离都进行：链路预算 -> OSNR -> OOK -> 加噪声 -> Q/BER
         case["fiber_length_km"] = float(distance)
         case["seed"] = int(cfg["seed"]) + i
         link = calculate_link_budget(case)
@@ -92,14 +93,14 @@ def run_distance_sweep(cfg: dict, results_dir: Path):
         )
 
     df = pd.DataFrame(rows)
-    df.to_csv(results_dir / "distance_sweep.csv", index=False)
+    df.to_csv(results_dir / "distance_sweep.csv", index=False)  # 保存数据，画图
     plot_distance_sweep(df, results_dir / "distance_sweep.png")
     plot_ber_q_curve(df, results_dir / "ber_q_curve.png")
     return df
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()    
     parser.add_argument(
         "--config",
         default=str(ROOT / "configs" / "default.json"),
