@@ -26,7 +26,7 @@ def bandwidth_nm_to_hz(wavelength_nm: float, bandwidth_nm: float) -> float:
 def estimate_osnr(rx_power_dBm: float, cfg: dict) -> OsnrResult:
     """Estimate OSNR in the configured optical reference bandwidth.
 
-    This is a compact interview-level model, not a full multi-span EDFA model.
+    This is a compact engineering approximation, not a full multi-span EDFA model.
     If amplifier_gain_dB > 0, ASE is approximated by
     P_ASE ~= NF * h * nu * (G - 1) * B_ref.
     Otherwise a configured receiver-side optical noise floor is used.
